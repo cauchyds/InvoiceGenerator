@@ -86,33 +86,33 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: nowrap;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: nowrap;
 }
 
 .logo-icon {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   background: var(--accent-gradient);
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
 }
 
-.logo-glyph {
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 800;
+.logo-svg {
+  width: 20px;
+  height: 20px;
   color: #ffffff;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .logo-text {
@@ -122,7 +122,7 @@ body {
 
 .logo-text h2 {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #ffffff;
@@ -138,6 +138,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-top: 2px;
+  white-space: nowrap;
 }
 
 .btn-settings {
@@ -993,43 +994,43 @@ input:checked + .slider:before {
 .layout-selector-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  background: rgba(0, 0, 0, 0.15);
-  padding: 6px;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px;
   border-radius: 10px;
   border: 1px solid var(--card-border);
 }
 
 .layout-btn {
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
   color: var(--text-secondary);
-  padding: 12px 8px;
-  font-size: 0.85rem;
+  padding: 8px 4px;
+  font-size: 0.78rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  text-align: center;
 }
 
 .layout-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .layout-btn.active {
-  background: var(--accent-gradient);
-  color: #ffffff;
+  background: var(--accent-color);
+  color: white;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .layout-icon {
-  font-size: 1.15rem;
+  font-size: 1rem;
 }
 
 /* ==========================================================================
@@ -1128,23 +1129,33 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 9px 12px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px dashed rgba(99, 102, 241, 0.35);
-  color: #818cf8;
+  gap: 8px;
+  padding: 11px 16px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
   border-radius: 8px;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .btn-add-item:hover {
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(99, 102, 241, 0.22);
   border-color: rgba(99, 102, 241, 0.5);
-  color: #a5b4fc;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25);
+}
+
+.btn-add-item:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15);
 }
 
 /* ==========================================================================
