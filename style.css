@@ -531,14 +531,29 @@ input:checked + .slider:before {
 }
 
 .receipt-meta {
-  text-align: right;
+  display: grid;
+  grid-template-columns: max-content min-content max-content;
+  gap: 4px 6px;
+  justify-content: end;
+  align-items: center;
   font-family: var(--receipt-font-sans);
   font-size: 0.9rem;
   color: #333;
 }
 
-.receipt-meta p {
-  margin-bottom: 4px;
+.receipt-meta-label {
+  text-align: right;
+}
+
+.receipt-meta-colon {
+  text-align: center;
+  font-weight: bold;
+}
+
+.receipt-meta-value {
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Addressee Info (宛名) */
@@ -635,29 +650,6 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-.receipt-proviso-container {
-  display: flex;
-  align-items: flex-end;
-  border-bottom: 1px solid var(--receipt-border-light);
-  padding-bottom: 8px;
-  margin-bottom: 20px;
-}
-
-.receipt-proviso-label {
-  font-family: var(--receipt-font-sans);
-  font-size: 0.85rem;
-  font-weight: bold;
-  white-space: nowrap;
-  width: 90px;
-}
-
-.receipt-proviso-val {
-  font-family: var(--receipt-font-serif);
-  font-size: 1.15rem;
-  padding-left: 10px;
-  flex: 1;
 }
 
 /* Dynamic Hanko Stamp Canvas Container */
@@ -1054,9 +1046,7 @@ input:checked + .slider:before {
   width: 100%;
 }
 
-.receipt-sheet.layout-portrait .receipt-proviso-container {
-  margin-bottom: 15px;
-}
+
 
 .receipt-sheet.layout-portrait .receipt-breakdown-box {
   width: 100%;
@@ -1197,9 +1187,16 @@ input:checked + .slider:before {
   border-bottom: none;
 }
 
-.receipt-items-table th.col-item-name,
+.receipt-items-table th.col-item-name {
+  text-align: left;
+  font-weight: bold;
+}
+
 .receipt-items-table td.col-item-name {
   text-align: left;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: #444;
 }
 
 .receipt-items-table th.col-item-qty,
@@ -1219,6 +1216,34 @@ input:checked + .slider:before {
   text-align: right;
   width: 110px;
   font-weight: 600;
+}
+
+/* Table Footer for Totals */
+.receipt-items-table tfoot td {
+  border-top: 2px double var(--receipt-border-dark);
+  font-weight: bold;
+  padding: 8px 8px;
+  background: #fcfcfc;
+}
+
+.receipt-items-table tfoot td.col-item-name {
+  text-align: left;
+  font-weight: bold;
+  color: #111;
+}
+
+.receipt-items-table tfoot td.col-item-qty {
+  text-align: center;
+}
+
+.receipt-items-table tfoot td.col-item-price {
+  /* empty */
+}
+
+.receipt-items-table tfoot td.col-item-amount {
+  text-align: right;
+  color: #111;
+  font-size: 0.85rem;
 }
 
 

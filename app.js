@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     taxRate10Input: document.getElementById('ctrl-tax-10-base'),
     taxAmount10Input: document.getElementById('ctrl-tax-10-val'),
     registrationNoInput: document.getElementById('ctrl-registration-no'),
-    provisoInput: document.getElementById('ctrl-proviso'),
     notesInput: document.getElementById('ctrl-notes'),
     issuerNameInput: document.getElementById('ctrl-issuer-name'),
     issuerAddressInput: document.getElementById('ctrl-issuer-address'),
@@ -83,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
     prevAddressee: document.getElementById('prev-addressee'),
     prevHonorific: document.getElementById('prev-honorific'),
     prevAmount: document.getElementById('prev-amount'),
-    prevProviso: document.getElementById('prev-proviso'),
     prevNotes: document.getElementById('prev-notes'),
     
 
@@ -105,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lblReceiptNo: document.getElementById('lbl-receipt-no'),
     lblReceiptDate: document.getElementById('lbl-receipt-date'),
     lblAmount: document.getElementById('lbl-amount'),
-    lblProviso: document.getElementById('lbl-proviso'),
     lblNotes: document.getElementById('lbl-notes'),
 
     lblBreakdownTitle: document.getElementById('lbl-breakdown-title'),
@@ -137,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.taxRate10Input.value = state.taxRate10Percent;
     elements.taxAmount10Input.value = state.taxAmount10Percent;
     elements.registrationNoInput.value = state.registrationNo;
-    elements.provisoInput.value = state.proviso;
     elements.notesInput.value = state.notes;
     elements.issuerNameInput.value = state.issuerName;
     elements.issuerAddressInput.value = state.issuerAddress;
@@ -175,8 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.receiptSheet.classList.remove('layout-portrait');
     }
 
-    // Populate quick proviso tags
-    updateProvisoTags();
+
 
     // Calculate initial sum & render sidebar items
     calculateTotalSum();
@@ -200,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
       { el: elements.addresseeInput, key: 'addressee' },
       { el: elements.addresseeTitleSelect, key: 'addresseeTitle' },
       { el: elements.registrationNoInput, key: 'registrationNo' },
-      { el: elements.provisoInput, key: 'proviso' },
       { el: elements.notesInput, key: 'notes' },
       { el: elements.issuerNameInput, key: 'issuerName' },
       { el: elements.issuerAddressInput, key: 'issuerAddress' },
@@ -237,14 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
           state.addresseeTitle = 'Esq.';
         }
         elements.addresseeTitleSelect.value = state.addresseeTitle;
-
-        // Auto-update default proviso list
-        updateProvisoTags();
-        
-        // Update state proviso with first default proviso of new language
-        const defProvs = customProvisos[state.lang] || customProvisos['ja'];
-        state.proviso = defProvs[0];
-        elements.provisoInput.value = state.proviso;
 
         renderPreview();
       });
@@ -390,13 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Therefore, Tax Exclusive = Total / 1.10
     // Tax Amount = Total - Tax Exclusive
     const total = state.totalAmount;
+    const isJpy = (state.currency === '￥');
     
-    // In Japan, JPY is always rounded to the nearest integer. Other currencies can keep decimal points.
-    if (state.currency === '￥' || state.currency === '¥') {
+    if (isJpy) {
       state.taxRate10Percent = Math.round(total / 1.10);
       state.taxAmount10Percent = total - state.taxRate10Percent;
     } else {
-      // 2 Decimal points for USD/EUR etc.
+      // 2 Decimal points for USD/EUR/CNY etc.
       state.taxRate10Percent = Math.round((total / 1.1) * 100) / 100;
       state.taxAmount10Percent = Math.round((total - state.taxRate10Percent) * 100) / 100;
     }
@@ -422,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="number" class="item-qty-input" data-index="${index}" min="1" step="1" value="${item.qty}" placeholder="数量">
         </div>
         <div class="col-price">
-          <input type="number" class="item-price-input" data-index="${index}" min="0" step="1" value="${item.price}" placeholder="単価">
+          <input type="number" class="item-price-input" data-index="${index}" min="0" step="any" value="${item.price}" placeholder="単価">
         </div>
         <button type="button" class="btn-delete-row" data-index="${index}" title="Delete Row" ${state.items.length === 1 ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
           🗑️
@@ -484,31 +470,17 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.totalAmountInput.value = sum;
   }
 
-  // --- Dynamic Proviso Tags Quick Select ---
-  function updateProvisoTags() {
-    elements.tagsContainer.innerHTML = '';
-    const tags = customProvisos[state.lang] || customProvisos['ja'];
-    
-    tags.forEach(tagText => {
-      const tag = document.createElement('span');
-      tag.classList.add('proviso-tag');
-      tag.textContent = tagText;
-      tag.addEventListener('click', () => {
-        state.proviso = tagText;
-        elements.provisoInput.value = tagText;
-        renderPreview();
-      });
-      elements.tagsContainer.appendChild(tag);
-    });
-  }
+
 
   // --- Formatting Helpers ---
   function formatCurrency(amount, currency) {
-    const isJpy = (currency === '￥' || currency === '¥');
+    const num = parseFloat(amount) || 0;
+    const isJpy = (currency === '￥');
+    const decimals = isJpy ? 0 : 2;
     const formattedNum = new Intl.NumberFormat(state.lang === 'ja' ? 'ja-JP' : 'en-US', {
-      minimumFractionDigits: isJpy ? 0 : 2,
-      maximumFractionDigits: isJpy ? 0 : 2
-    }).format(amount);
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(num);
     
     if (isJpy) {
       // Traditional Japanese JPY amounts on receipts start with a currency sign and end with a dash.
@@ -649,7 +621,6 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.lblReceiptNo.textContent = t.receiptNo;
     elements.lblReceiptDate.textContent = t.date;
     elements.lblAmount.textContent = t.amount;
-    elements.lblProviso.textContent = t.proviso;
     elements.lblNotes.textContent = t.notes;
 
     // Breakdown table labels
@@ -670,7 +641,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Format receipt total amount
     elements.prevAmount.textContent = formatCurrency(state.totalAmount, state.currency);
-    elements.prevProviso.textContent = state.proviso;
     
     // Render dynamic itemized table
     const tbody = document.getElementById('prev-items-tbody');
@@ -679,8 +649,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Localized headers
       document.getElementById('lbl-col-name').textContent = state.lang === 'en' ? 'Description' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '明细项目 / 品名' : '品名 / 項目');
-      document.getElementById('lbl-col-qty').textContent = state.lang === 'en' ? 'Qty' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '数量' : '数量');
       document.getElementById('lbl-col-price').textContent = state.lang === 'en' ? 'Unit Price' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '单价' : '単価');
+      document.getElementById('lbl-col-qty').textContent = state.lang === 'en' ? 'Qty' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '数量' : '数量');
       document.getElementById('lbl-col-amount').textContent = state.lang === 'en' ? 'Amount' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '金额' : '金額');
 
       state.items.forEach(item => {
@@ -690,25 +660,50 @@ document.addEventListener('DOMContentLoaded', () => {
         tdName.className = 'col-item-name';
         tdName.textContent = item.desc;
         
-        const tdQty = document.createElement('td');
-        tdQty.className = 'col-item-qty';
-        tdQty.textContent = item.qty;
-        
         const tdPrice = document.createElement('td');
         tdPrice.className = 'col-item-price';
         tdPrice.textContent = formatCurrency(item.price, state.currency);
+        
+        const tdQty = document.createElement('td');
+        tdQty.className = 'col-item-qty';
+        tdQty.textContent = item.qty;
         
         const tdAmount = document.createElement('td');
         tdAmount.className = 'col-item-amount';
         tdAmount.textContent = formatCurrency(item.qty * item.price, state.currency);
         
         tr.appendChild(tdName);
-        tr.appendChild(tdQty);
         tr.appendChild(tdPrice);
+        tr.appendChild(tdQty);
         tr.appendChild(tdAmount);
         
         tbody.appendChild(tr);
       });
+
+      // Calculate totals for tfoot
+      let totalQty = 0;
+      state.items.forEach(item => {
+        totalQty += (item.qty || 0);
+      });
+      
+      const lblTotalRow = document.getElementById('lbl-total-row');
+      if (lblTotalRow) {
+        let totalWord = '合計';
+        if (state.lang === 'en') totalWord = 'Total';
+        else if (state.lang === 'zh_CN') totalWord = '合计';
+        else if (state.lang === 'zh_TW') totalWord = '合計';
+        lblTotalRow.textContent = totalWord;
+      }
+      
+      const prevTotalQty = document.getElementById('prev-total-qty');
+      if (prevTotalQty) {
+        prevTotalQty.textContent = totalQty;
+      }
+      
+      const prevTotalAmount = document.getElementById('prev-total-amount');
+      if (prevTotalAmount) {
+        prevTotalAmount.textContent = formatCurrency(state.totalAmount, state.currency);
+      }
     }
     
     // Notes content (replacing newlines with <br> for HTML rendering)

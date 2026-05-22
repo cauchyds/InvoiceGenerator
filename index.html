@@ -125,21 +125,12 @@
           </div>
         </section>
 
-        <!-- Section 4: Proviso & Remarks (但し書き・備考) -->
+        <!-- Section 4: Remarks (備考) -->
         <section class="form-section" aria-labelledby="sec-additional-title">
-          <h2 class="form-section-title" id="sec-additional-title">✏️ Remarks & Proviso</h2>
-          <div class="form-group">
-            <label for="ctrl-proviso">Proviso (但し書き)</label>
-            <input type="text" id="ctrl-proviso" placeholder="但し書きを入力または选择">
-            <!-- Dynamic quick tags -->
-            <div class="tag-container" id="proviso-tags" aria-label="Quick Proviso Suggestions">
-              <!-- Inline tags populated by javascript -->
-            </div>
-          </div>
-
+          <h2 class="form-section-title" id="sec-additional-title">✏️ Remarks</h2>
           <div class="form-group">
             <label for="ctrl-notes">Remarks / Notes (備考)</label>
-            <textarea id="ctrl-notes" rows="3" placeholder="e.g., お振込手数料は貴社にてご負担願います。"></textarea>
+            <textarea id="ctrl-notes" rows="4" placeholder="e.g., お振込手数料は貴社にてご負担願います。"></textarea>
           </div>
         </section>
       </div>
@@ -169,8 +160,13 @@
                 <span class="receipt-title" id="receipt-title-text">領収書</span>
               </div>
               <div class="receipt-meta">
-                <p><span id="lbl-receipt-no">領収書番号</span>: <span id="prev-receipt-no">RC-2026052201</span></p>
-                <p><span id="lbl-receipt-date">領収日</span>: <span id="prev-date">2026年5月22日</span></p>
+                <span class="receipt-meta-label" id="lbl-receipt-no">領収書番号</span>
+                <span class="receipt-meta-colon">:</span>
+                <span class="receipt-meta-value" id="prev-receipt-no">RC-2026052201</span>
+                
+                <span class="receipt-meta-label" id="lbl-receipt-date">領収日</span>
+                <span class="receipt-meta-colon">:</span>
+                <span class="receipt-meta-value" id="prev-date">2026年5月22日</span>
               </div>
             </div>
 
@@ -186,29 +182,31 @@
               <span class="receipt-amount" id="prev-amount">￥110,000-</span>
             </div>
 
-            <!-- 4. Mid Section (Proviso & Invoice Breakdown) -->
+            <!-- 4. Mid Section (Invoice Breakdown) -->
             <div class="receipt-details-section">
               <div class="receipt-left-details">
-                <!-- Proviso -->
-                <div class="receipt-proviso-container">
-                  <span class="receipt-proviso-label" id="lbl-proviso">但し書き</span>
-                  <span class="receipt-proviso-val" id="prev-proviso">宿泊費として</span>
-                </div>
-
                 <!-- Itemized Fee Table (明细项目表) -->
                 <div class="receipt-items-table-container" id="prev-items-table-container">
                   <table class="receipt-items-table">
                     <thead>
                       <tr>
                         <th class="col-item-name" id="lbl-col-name">品名 / 項目 (Description)</th>
-                        <th class="col-item-qty" id="lbl-col-qty">数量</th>
                         <th class="col-item-price" id="lbl-col-price">単価</th>
+                        <th class="col-item-qty" id="lbl-col-qty">数量</th>
                         <th class="col-item-amount" id="lbl-col-amount">金額</th>
                       </tr>
                     </thead>
                     <tbody id="prev-items-tbody">
                       <!-- Dynamic rows injected by JS -->
                     </tbody>
+                    <tfoot id="prev-items-tfoot">
+                      <tr>
+                        <td class="col-item-name" id="lbl-total-row">合計</td>
+                        <td class="col-item-price"></td>
+                        <td class="col-item-qty" id="prev-total-qty">0</td>
+                        <td class="col-item-amount" id="prev-total-amount">￥0</td>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
 
