@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- State Configuration ---
   const state = {
     lang: 'ja',
+    layout: 'portrait',
     currency: '￥',
     receiptNo: 'RC-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '01',
     date: new Date().toISOString().slice(0, 10),
@@ -27,7 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
     issuerTel: '075-123-4567',
     issuerEmail: 'stay@kyoto-sakura.jp',
     hankoText: '京都民泊\n桜之印',
-    useHanko: true
+    useHanko: true,
+    items: [
+      { desc: '宿泊費', qty: 1, price: 110000 }
+    ]
   };
 
   // --- Quick Provisos Options Map ---
@@ -109,7 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
     lblBreakdownTax: document.getElementById('lbl-breakdown-tax'),
     lblBreakdown10Base: document.getElementById('lbl-breakdown-10-base'),
     lblBreakdown10Val: document.getElementById('lbl-breakdown-10-val'),
-    lblBreakdownRegistration: document.getElementById('lbl-breakdown-registration')
+    lblBreakdownRegistration: document.getElementById('lbl-breakdown-registration'),
+
+    // Settings modal elements
+    btnSettings: document.getElementById('btn-settings'),
+    settingsModal: document.getElementById('settings-modal'),
+    btnCloseSettings: document.getElementById('btn-close-settings'),
+    btnSaveSettings: document.getElementById('btn-save-settings'),
+    layoutBtns: document.querySelectorAll('.layout-btn')
   };
 
   // --- Initialize App State from UI ---
@@ -144,8 +155,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Set initial active layout button and body/sheet classes
+    elements.layoutBtns.forEach(btn => {
+      if (btn.dataset.layout === state.layout) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    if (state.layout === 'portrait') {
+      document.body.classList.add('layout-portrait');
+      document.body.classList.remove('layout-landscape');
+      elements.receiptSheet.classList.add('layout-portrait');
+      elements.receiptSheet.classList.remove('layout-landscape');
+    } else {
+      document.body.classList.add('layout-landscape');
+      document.body.classList.remove('layout-portrait');
+      elements.receiptSheet.classList.add('layout-landscape');
+      elements.receiptSheet.classList.remove('layout-portrait');
+    }
+
     // Populate quick proviso tags
     updateProvisoTags();
+
+    // Calculate initial sum & render sidebar items
+    calculateTotalSum();
+    renderSidebarItems();
 
     // Perform initial calculations, scaling, and render
     handleTaxCalculations();
@@ -264,8 +299,60 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPreview();
     });
 
-    // Export PDF / Print
+    // Settings Modal toggles
+    elements.btnSettings.addEventListener('click', () => {
+      elements.settingsModal.classList.remove('hidden');
+    });
+
+    elements.btnCloseSettings.addEventListener('click', () => {
+      elements.settingsModal.classList.add('hidden');
+    });
+
+    elements.btnSaveSettings.addEventListener('click', () => {
+      elements.settingsModal.classList.add('hidden');
+      renderPreview();
+    });
+
+    elements.settingsModal.addEventListener('click', (e) => {
+      if (e.target === elements.settingsModal) {
+        elements.settingsModal.classList.add('hidden');
+      }
+    });
+
+    // Layout Selector Buttons
+    elements.layoutBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        elements.layoutBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.layout = btn.dataset.layout;
+
+        if (state.layout === 'portrait') {
+          document.body.classList.add('layout-portrait');
+          document.body.classList.remove('layout-landscape');
+          elements.receiptSheet.classList.add('layout-portrait');
+          elements.receiptSheet.classList.remove('layout-landscape');
+        } else {
+          document.body.classList.add('layout-landscape');
+          document.body.classList.remove('layout-portrait');
+          elements.receiptSheet.classList.add('layout-landscape');
+          elements.receiptSheet.classList.remove('layout-portrait');
+        }
+
+        renderPreview();
+        updateResponsiveScale();
+      });
+    });
+
+    // Export PDF / Print with Dynamic Orientation style injection
     elements.btnPrint.addEventListener('click', () => {
+      const existingStyle = document.getElementById('dynamic-print-style');
+      if (existingStyle) existingStyle.remove();
+
+      const style = document.createElement('style');
+      style.id = 'dynamic-print-style';
+      style.innerHTML = `@page { size: A4 ${state.layout}; margin: 0; }`;
+      document.head.appendChild(style);
+
       window.print();
     });
 
@@ -275,6 +362,19 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.clear();
         window.location.reload();
       }
+    });
+
+    // Add Item button
+    document.getElementById('btn-add-item').addEventListener('click', () => {
+      let defaultDesc = '宿泊費';
+      if (state.lang === 'en') defaultDesc = 'Accommodation';
+      else if (state.lang === 'zh_CN' || state.lang === 'zh_TW') defaultDesc = '住宿费';
+      
+      state.items.push({ desc: defaultDesc, qty: 1, price: 0 });
+      renderSidebarItems();
+      calculateTotalSum();
+      handleTaxCalculations();
+      renderPreview();
     });
 
     // Handle window resize for dynamic preview scale
@@ -303,6 +403,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.taxRate10Input.value = state.taxRate10Percent;
     elements.taxAmount10Input.value = state.taxAmount10Percent;
+  }
+
+  // --- Render Sidebar Items Manager ---
+  function renderSidebarItems() {
+    const listContainer = document.getElementById('fee-items-list');
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+
+    state.items.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'fee-item-row';
+      row.innerHTML = `
+        <div class="col-desc">
+          <input type="text" class="item-desc-input" data-index="${index}" value="${item.desc}" placeholder="品名/項目">
+        </div>
+        <div class="col-qty">
+          <input type="number" class="item-qty-input" data-index="${index}" min="1" step="1" value="${item.qty}" placeholder="数量">
+        </div>
+        <div class="col-price">
+          <input type="number" class="item-price-input" data-index="${index}" min="0" step="1" value="${item.price}" placeholder="単価">
+        </div>
+        <button type="button" class="btn-delete-row" data-index="${index}" title="Delete Row" ${state.items.length === 1 ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
+          🗑️
+        </button>
+      `;
+      listContainer.appendChild(row);
+    });
+
+    // Add event listeners to inputs
+    listContainer.querySelectorAll('.item-desc-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        state.items[idx].desc = e.target.value;
+        renderPreview();
+      });
+    });
+
+    listContainer.querySelectorAll('.item-qty-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        state.items[idx].qty = parseInt(e.target.value) || 1;
+        calculateTotalSum();
+        handleTaxCalculations();
+        renderPreview();
+      });
+    });
+
+    listContainer.querySelectorAll('.item-price-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        state.items[idx].price = parseFloat(e.target.value) || 0;
+        calculateTotalSum();
+        handleTaxCalculations();
+        renderPreview();
+      });
+    });
+
+    listContainer.querySelectorAll('.btn-delete-row').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.dataset.index);
+        if (state.items.length > 1) {
+          state.items.splice(idx, 1);
+          calculateTotalSum();
+          handleTaxCalculations();
+          renderSidebarItems();
+          renderPreview();
+        }
+      });
+    });
+  }
+
+  // --- Calculate Items Sum ---
+  function calculateTotalSum() {
+    let sum = 0;
+    state.items.forEach(item => {
+      sum += (item.qty || 1) * (item.price || 0);
+    });
+    state.totalAmount = sum;
+    elements.totalAmountInput.value = sum;
   }
 
   // --- Dynamic Proviso Tags Quick Select ---
@@ -493,6 +672,45 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.prevAmount.textContent = formatCurrency(state.totalAmount, state.currency);
     elements.prevProviso.textContent = state.proviso;
     
+    // Render dynamic itemized table
+    const tbody = document.getElementById('prev-items-tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      
+      // Localized headers
+      document.getElementById('lbl-col-name').textContent = state.lang === 'en' ? 'Description' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '明细项目 / 品名' : '品名 / 項目');
+      document.getElementById('lbl-col-qty').textContent = state.lang === 'en' ? 'Qty' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '数量' : '数量');
+      document.getElementById('lbl-col-price').textContent = state.lang === 'en' ? 'Unit Price' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '单价' : '単価');
+      document.getElementById('lbl-col-amount').textContent = state.lang === 'en' ? 'Amount' : (state.lang === 'zh_CN' || state.lang === 'zh_TW' ? '金额' : '金額');
+
+      state.items.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        const tdName = document.createElement('td');
+        tdName.className = 'col-item-name';
+        tdName.textContent = item.desc;
+        
+        const tdQty = document.createElement('td');
+        tdQty.className = 'col-item-qty';
+        tdQty.textContent = item.qty;
+        
+        const tdPrice = document.createElement('td');
+        tdPrice.className = 'col-item-price';
+        tdPrice.textContent = formatCurrency(item.price, state.currency);
+        
+        const tdAmount = document.createElement('td');
+        tdAmount.className = 'col-item-amount';
+        tdAmount.textContent = formatCurrency(item.qty * item.price, state.currency);
+        
+        tr.appendChild(tdName);
+        tr.appendChild(tdQty);
+        tr.appendChild(tdPrice);
+        tr.appendChild(tdAmount);
+        
+        tbody.appendChild(tr);
+      });
+    }
+    
     // Notes content (replacing newlines with <br> for HTML rendering)
     elements.prevNotes.innerHTML = state.notes.replace(/\n/g, '<br>');
 
@@ -526,10 +744,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const workspace = elements.previewWorkspace;
     const wrapper = elements.receiptWrapper;
     
-    // Dimensions of the receipt sheet (defined in CSS as 297mm x 210mm)
+    // Dimensions of the receipt sheet (defined in CSS as 297mm x 210mm for Landscape, 210mm x 297mm for Portrait)
     // Convert mm to pixels roughly at 96 DPI: 297mm = 1122.5px, 210mm = 793.7px
-    const targetWidth = 1122.5;
-    const targetHeight = 793.7;
+    const isPortrait = state.layout === 'portrait';
+    const targetWidth = isPortrait ? 793.7 : 1122.5;
+    const targetHeight = isPortrait ? 1122.5 : 793.7;
     
     // Get padding-adjusted workspace dimensions
     const wsWidth = workspace.clientWidth - 80; // 40px padding on each side
@@ -555,6 +774,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const parsed = JSON.parse(savedState);
       // Deep merge parsed settings back to state
       Object.assign(state, parsed);
+      
+      // Safe fallback/migration for items array
+      if (!state.items || !Array.isArray(state.items)) {
+        state.items = [
+          { desc: '宿泊費', qty: 1, price: state.totalAmount || 110000 }
+        ];
+      }
     } catch (e) {
       console.warn('Failed to parse cached state. Using defaults.', e);
     }

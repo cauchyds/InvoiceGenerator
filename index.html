@@ -19,10 +19,34 @@
          ========================================================================== -->
     <aside class="control-sidebar" aria-label="Control Panel">
       <header class="sidebar-header">
-        <h1><span>🏨</span> Receipt Engine</h1>
+        <div class="logo-container">
+          <div class="logo-icon">
+            <span class="logo-glyph">IGS</span>
+          </div>
+          <div class="logo-text">
+            <h2>IGS</h2>
+            <p>Invoice Generation System</p>
+          </div>
+        </div>
+        <button type="button" class="btn-settings" id="btn-settings" aria-label="Settings" title="Configure System Settings">
+          <span>⚙️</span>
+        </button>
       </header>
 
       <div class="sidebar-scroll-area">
+        <!-- Section 0: Layout Orientation (排版方向) -->
+        <section class="form-section" aria-labelledby="sec-layout-title">
+          <h2 class="form-section-title" id="sec-layout-title">📐 Layout Orientation (排版方向)</h2>
+          <div class="layout-selector-group" role="group" aria-label="Layout Selector">
+            <button type="button" class="layout-btn" data-layout="landscape">
+              <span class="layout-icon">▤</span> Horizontal (横)
+            </button>
+            <button type="button" class="layout-btn active" data-layout="portrait">
+              <span class="layout-icon">▧</span> Vertical (竖)
+            </button>
+          </div>
+        </section>
+
         <!-- Section 1: Localization & Currency -->
         <section class="form-section" aria-labelledby="sec-lang-title">
           <h2 class="form-section-title" id="sec-lang-title">🌐 Language & Currency</h2>
@@ -78,15 +102,29 @@
               </select>
             </div>
           </div>
+        </section>
 
-          <div class="form-group">
-            <label for="ctrl-amount">Total Amount (領収金額)</label>
-            <input type="number" id="ctrl-amount" min="0" step="1" placeholder="e.g., 110000">
+        <!-- Section 3: Fee Items (明细项目与自动加总) -->
+        <section class="form-section" aria-labelledby="sec-items-title">
+          <h2 class="form-section-title" id="sec-items-title">💰 Fee Items (费用明细与加总)</h2>
+          <div class="fee-items-container" id="fee-items-list">
+            <!-- Dynamic rows injected by JS -->
           </div>
+          <button type="button" class="btn-add-item" id="btn-add-item">
+            <span>➕</span> Add Item (添加明细)
+          </button>
+          <div class="form-group" style="margin-top: 14px; border-top: 1px dashed var(--card-border); padding-top: 10px;">
+            <label for="ctrl-amount">Calculated Total (自动求和金额)</label>
+            <input type="text" id="ctrl-amount" readonly style="background: rgba(255,255,255,0.02); font-weight: bold; color: var(--success-color); border-color: rgba(16, 185, 129, 0.2);" placeholder="0">
+          </div>
+        </section>
 
+        <!-- Section 4: Proviso & Remarks (但し書き・備考) -->
+        <section class="form-section" aria-labelledby="sec-additional-title">
+          <h2 class="form-section-title" id="sec-additional-title">✏️ Remarks & Proviso</h2>
           <div class="form-group">
             <label for="ctrl-proviso">Proviso (但し書き)</label>
-            <input type="text" id="ctrl-proviso" placeholder="但し書きを入力または選択">
+            <input type="text" id="ctrl-proviso" placeholder="但し書きを入力または选择">
             <!-- Dynamic quick tags -->
             <div class="tag-container" id="proviso-tags" aria-label="Quick Proviso Suggestions">
               <!-- Inline tags populated by javascript -->
@@ -95,100 +133,7 @@
 
           <div class="form-group">
             <label for="ctrl-notes">Remarks / Notes (備考)</label>
-            <textarea id="ctrl-notes" rows="2" placeholder="e.g., お振込手数料は貴社にてご負担願います。"></textarea>
-          </div>
-        </section>
-
-        <!-- Section 3: Japanese Invoice System & Tax Breakdown -->
-        <section class="form-section" aria-labelledby="sec-invoice-title">
-          <h2 class="form-section-title" id="sec-invoice-title">📊 Tax & Invoice System</h2>
-          
-          <div class="form-group">
-            <div class="switch-container">
-              <div class="switch-label-desc">
-                <span>Invoice System (適格領収書)</span>
-                <span>Renders breakdown table & registration number</span>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="ctrl-invoice-mode" checked>
-                <span class="slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="switch-container">
-              <div class="switch-label-desc">
-                <span>Auto-Calculate Consumption Tax</span>
-                <span>Computes JPY 10% standard rate automatically</span>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="ctrl-auto-tax" checked>
-                <span class="slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="ctrl-registration-no">Tax Registration Number (登録番号)</label>
-            <input type="text" id="ctrl-registration-no" placeholder="T1234567890123" maxlength="14">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="ctrl-tax-10-base">10% Taxable Base (税抜額)</label>
-              <input type="number" id="ctrl-tax-10-base" disabled>
-            </div>
-            <div class="form-group">
-              <label for="ctrl-tax-10-val">10% Tax Amount (消費税額)</label>
-              <input type="number" id="ctrl-tax-10-val" disabled>
-            </div>
-          </div>
-        </section>
-
-
-
-        <!-- Section 5: Issuer & Hanko Details -->
-        <section class="form-section" aria-labelledby="sec-issuer-title">
-          <h2 class="form-section-title" id="sec-issuer-title">🏢 Issuer Information</h2>
-          
-          <div class="form-group">
-            <label for="ctrl-issuer-name">Minshuku / Business Name (領収者名)</label>
-            <input type="text" id="ctrl-issuer-name" placeholder="e.g., 京都民泊・桜">
-          </div>
-
-          <div class="form-group">
-            <label for="ctrl-issuer-address">Address (住所)</label>
-            <textarea id="ctrl-issuer-address" rows="2" placeholder="e.g., 京都市中京区..."></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="ctrl-issuer-tel">Telephone (電話番号)</label>
-              <input type="text" id="ctrl-issuer-tel" placeholder="e.g., 075-123-4567">
-            </div>
-            <div class="form-group">
-              <label for="ctrl-issuer-email">Email (メール)</label>
-              <input type="text" id="ctrl-issuer-email" placeholder="stay@kyoto-sakura.jp">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="switch-container">
-              <div class="switch-label-desc">
-                <span>Enable Virtual Hanko Stamp</span>
-                <span>Generates authentic red square seal</span>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="ctrl-use-hanko" checked>
-                <span class="slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="ctrl-hanko-text">Stamp Text (角印文字 - 2~4字ずつ改行推奨)</label>
-            <textarea id="ctrl-hanko-text" rows="2" placeholder="京都民泊&#10;桜之印"></textarea>
+            <textarea id="ctrl-notes" rows="3" placeholder="e.g., お振込手数料は貴社にてご負担願います。"></textarea>
           </div>
         </section>
       </div>
@@ -242,6 +187,23 @@
                 <div class="receipt-proviso-container">
                   <span class="receipt-proviso-label" id="lbl-proviso">但し書き</span>
                   <span class="receipt-proviso-val" id="prev-proviso">宿泊費として</span>
+                </div>
+
+                <!-- Itemized Fee Table (明细项目表) -->
+                <div class="receipt-items-table-container" id="prev-items-table-container">
+                  <table class="receipt-items-table">
+                    <thead>
+                      <tr>
+                        <th class="col-item-name" id="lbl-col-name">品名 / 項目 (Description)</th>
+                        <th class="col-item-qty" id="lbl-col-qty">数量</th>
+                        <th class="col-item-price" id="lbl-col-price">単価</th>
+                        <th class="col-item-amount" id="lbl-col-amount">金額</th>
+                      </tr>
+                    </thead>
+                    <tbody id="prev-items-tbody">
+                      <!-- Dynamic rows injected by JS -->
+                    </tbody>
+                  </table>
                 </div>
 
                 <!-- Notes / Remarks Box -->
@@ -305,6 +267,116 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- ==========================================================================
+       SETTINGS MODAL OVERLAY (⚙️)
+       ========================================================================== -->
+  <div class="modal-overlay hidden" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modal-title">⚙️ System & Issuer Settings</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-settings" aria-label="Close Settings">&times;</button>
+      </header>
+      
+      <div class="modal-body">
+
+        <!-- Section B: Japanese Invoice System & Tax Breakdown -->
+        <section class="modal-section">
+          <h4 class="modal-section-title">📊 Tax & Invoice System (インボイス制度)</h4>
+          
+          <div class="form-group">
+            <div class="switch-container">
+              <div class="switch-label-desc">
+                <span>Invoice System (適格領収書)</span>
+                <span>Renders breakdown table & registration number</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ctrl-invoice-mode" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="switch-container">
+              <div class="switch-label-desc">
+                <span>Auto-Calculate Consumption Tax</span>
+                <span>Computes JPY 10% standard rate automatically</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ctrl-auto-tax" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-registration-no">Tax Registration Number (登録番号)</label>
+            <input type="text" id="ctrl-registration-no" placeholder="T1234567890123" maxlength="14">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ctrl-tax-10-base">10% Taxable Base (税抜額)</label>
+              <input type="number" id="ctrl-tax-10-base" disabled>
+            </div>
+            <div class="form-group">
+              <label for="ctrl-tax-10-val">10% Tax Amount (消費税額)</label>
+              <input type="number" id="ctrl-tax-10-val" disabled>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section C: Issuer & Hanko Details -->
+        <section class="modal-section">
+          <h4 class="modal-section-title">🏢 Issuer Information & Hanko (角印)</h4>
+          
+          <div class="form-group">
+            <label for="ctrl-issuer-name">Minshuku / Business Name (領収者名)</label>
+            <input type="text" id="ctrl-issuer-name" placeholder="e.g., 京都民泊・桜">
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-issuer-address">Address (住所)</label>
+            <textarea id="ctrl-issuer-address" rows="2" placeholder="e.g., 京都市中京区..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ctrl-issuer-tel">Telephone (電話番号)</label>
+              <input type="text" id="ctrl-issuer-tel" placeholder="e.g., 075-123-4567">
+            </div>
+            <div class="form-group">
+              <label for="ctrl-issuer-email">Email (メール)</label>
+              <input type="text" id="ctrl-issuer-email" placeholder="stay@kyoto-sakura.jp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="switch-container">
+              <div class="switch-label-desc">
+                <span>Enable Virtual Hanko Stamp</span>
+                <span>Generates authentic red square seal</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ctrl-use-hanko" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-hanko-text">Stamp Text (角印文字 - 2~4字ずつ改行推奨)</label>
+            <textarea id="ctrl-hanko-text" rows="2" placeholder="京都民泊&#10;桜之印"></textarea>
+          </div>
+        </section>
+      </div>
+      
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn-save-settings">Save & Apply (保存并应用)</button>
+      </footer>
+    </div>
   </div>
 
   <!-- Global scripts loading safely under file:// protocols -->
