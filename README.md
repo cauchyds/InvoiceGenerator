@@ -34,6 +34,12 @@ Open your terminal, navigate to this directory, and run the macOS launcher scrip
 ```
 The launcher will ask whether you want to open the file directly (Option 1) or start a lightweight, private Python web server (Option 2) on `http://localhost:8000`.
 
+### Method C: Online Access via GitHub Pages (Public Hosting)
+Since you've made this repository public, you can deploy and access it directly online at:
+👉 `https://cauchyds.github.io/InvoiceGenerator/`
+
+*(To enable this, go to your GitHub repository -> Settings -> Pages -> Build and deployment -> Branch, choose `main` and click Save. All calculations and inputs remain 100% client-side and completely private!)*
+
 ---
 
 ## 🖨️ PDF Printing & Saving Recommendations
