@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>民宿・費用領受書/領収書ジェネレーター | Professional Minshuku Receipt Generator</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="適格請求書（インボイス制度）に対応した、日本国内の民宿・ホテル向けの多言語（日・中・英）領収書・費用領受書自動作成ツールです。所見即所得（WYSIWYG）で直感的に操作できます。">
+  <meta name="keywords" content="領収書作成, インボイス対応, 民宿領収書, 費用領受书, Invoice Generator Japan, Minshuku Receipt PDF">
+  
+  <!-- Premium Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- ==========================================================================
+         LEFT PANEL: Interactive Control Sidebar
+         ========================================================================== -->
+    <aside class="control-sidebar" aria-label="Control Panel">
+      <header class="sidebar-header">
+        <h1><span>🏨</span> Receipt Engine</h1>
+      </header>
+
+      <div class="sidebar-scroll-area">
+        <!-- Section 1: Localization & Currency -->
+        <section class="form-section" aria-labelledby="sec-lang-title">
+          <h2 class="form-section-title" id="sec-lang-title">🌐 Language & Currency</h2>
+          
+          <div class="form-group">
+            <label>Output Language (言語選択)</label>
+            <div class="lang-selector-group" role="group" aria-label="Language Selector">
+              <button type="button" class="lang-btn active" data-lang="ja">日本語</button>
+              <button type="button" class="lang-btn" data-lang="zh_CN">简体中文</button>
+              <button type="button" class="lang-btn" data-lang="zh_TW">繁體中文</button>
+              <button type="button" class="lang-btn" data-lang="en">English</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-currency">Currency (通貨符号)</label>
+            <select id="ctrl-currency">
+              <option value="￥">JPY (￥) - 日本円</option>
+              <option value="$">USD ($) - 米ドル</option>
+              <option value="¥">CNY (¥) - 人民元</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Section 2: Basic Receipt Details -->
+        <section class="form-section" aria-labelledby="sec-basic-title">
+          <h2 class="form-section-title" id="sec-basic-title">📝 Receipt Info</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ctrl-receipt-no">Receipt Number (領収書番号)</label>
+              <input type="text" id="ctrl-receipt-no" placeholder="e.g., RC-202605001">
+            </div>
+            <div class="form-group">
+              <label for="ctrl-date">Issue Date (領収日)</label>
+              <input type="date" id="ctrl-date">
+            </div>
+          </div>
+
+          <div class="form-row" style="grid-template-columns: 2fr 1fr;">
+            <div class="form-group">
+              <label for="ctrl-addressee">Addressee Name (宛名)</label>
+              <input type="text" id="ctrl-addressee" placeholder="e.g., 株式会社グローバル・トラベル">
+            </div>
+            <div class="form-group">
+              <label for="ctrl-title">Honorific (敬称)</label>
+              <select id="ctrl-title">
+                <option value="様">様 (For Individuals)</option>
+                <option value="御中">御中 (For Companies)</option>
+                <option value="先生/女士 御中">先生/女士 御中</option>
+                <option value="Esq.">Esq.</option>
+                <option value="">None (無し)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-amount">Total Amount (領収金額)</label>
+            <input type="number" id="ctrl-amount" min="0" step="1" placeholder="e.g., 110000">
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-proviso">Proviso (但し書き)</label>
+            <input type="text" id="ctrl-proviso" placeholder="但し書きを入力または選択">
+            <!-- Dynamic quick tags -->
+            <div class="tag-container" id="proviso-tags" aria-label="Quick Proviso Suggestions">
+              <!-- Inline tags populated by javascript -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-notes">Remarks / Notes (備考)</label>
+            <textarea id="ctrl-notes" rows="2" placeholder="e.g., お振込手数料は貴社にてご負担願います。"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 3: Japanese Invoice System & Tax Breakdown -->
+        <section class="form-section" aria-labelledby="sec-invoice-title">
+          <h2 class="form-section-title" id="sec-invoice-title">📊 Tax & Invoice System</h2>
+          
+          <div class="form-group">
+            <div class="switch-container">
+              <div class="switch-label-desc">
+                <span>Invoice System (適格領収書)</span>
+                <span>Renders breakdown table & registration number</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ctrl-invoice-mode" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="switch-container">
+              <div class="switch-label-desc">
+                <span>Auto-Calculate Consumption Tax</span>
+                <span>Computes JPY 10% standard rate automatically</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ctrl-auto-tax" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-registration-no">Tax Registration Number (登録番号)</label>
+            <input type="text" id="ctrl-registration-no" placeholder="T1234567890123" maxlength="14">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ctrl-tax-10-base">10% Taxable Base (税抜額)</label>
+              <input type="number" id="ctrl-tax-10-base" disabled>
+            </div>
+            <div class="form-group">
+              <label for="ctrl-tax-10-val">10% Tax Amount (消費税額)</label>
+              <input type="number" id="ctrl-tax-10-val" disabled>
+            </div>
+          </div>
+        </section>
+
+
+
+        <!-- Section 5: Issuer & Hanko Details -->
+        <section class="form-section" aria-labelledby="sec-issuer-title">
+          <h2 class="form-section-title" id="sec-issuer-title">🏢 Issuer Information</h2>
+          
+          <div class="form-group">
+            <label for="ctrl-issuer-name">Minshuku / Business Name (領収者名)</label>
+            <input type="text" id="ctrl-issuer-name" placeholder="e.g., 京都民泊・桜">
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-issuer-address">Address (住所)</label>
+            <textarea id="ctrl-issuer-address" rows="2" placeholder="e.g., 京都市中京区..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ctrl-issuer-tel">Telephone (電話番号)</label>
+              <input type="text" id="ctrl-issuer-tel" placeholder="e.g., 075-123-4567">
+            </div>
+            <div class="form-group">
+              <label for="ctrl-issuer-email">Email (メール)</label>
+              <input type="text" id="ctrl-issuer-email" placeholder="stay@kyoto-sakura.jp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="switch-container">
+              <div class="switch-label-desc">
+                <span>Enable Virtual Hanko Stamp</span>
+                <span>Generates authentic red square seal</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ctrl-use-hanko" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctrl-hanko-text">Stamp Text (角印文字 - 2~4字ずつ改行推奨)</label>
+            <textarea id="ctrl-hanko-text" rows="2" placeholder="京都民泊&#10;桜之印"></textarea>
+          </div>
+        </section>
+      </div>
+
+      <!-- Action buttons -->
+      <footer class="sidebar-footer">
+        <button type="button" class="btn btn-primary" id="btn-print">
+          <span>🖨️</span> Print / Save as PDF (PDF出力)
+        </button>
+        <button type="button" class="btn btn-secondary" id="btn-reset">
+          <span>🔄</span> Reset Form (フォームリセット)
+        </button>
+      </footer>
+    </aside>
+
+    <!-- ==========================================================================
+         RIGHT PANEL: Interactive A4 WYSIWYG Preview Board
+         ========================================================================== -->
+    <main class="preview-workspace" aria-label="Receipt Live Preview">
+      <div class="receipt-wrapper">
+        <div class="receipt-sheet" id="print-area">
+          <div class="receipt-frame">
+            
+            <!-- 1. Header (Title, No, Date) -->
+            <div class="receipt-header">
+              <div class="receipt-title-container">
+                <span class="receipt-title" id="receipt-title-text">領収書</span>
+              </div>
+              <div class="receipt-meta">
+                <p><span id="lbl-receipt-no">領収書番号</span>: <span id="prev-receipt-no">RC-2026052201</span></p>
+                <p><span id="lbl-receipt-date">領収日</span>: <span id="prev-date">2026年5月22日</span></p>
+              </div>
+            </div>
+
+            <!-- 2. Addressee -->
+            <div class="receipt-addressee-container">
+              <span class="receipt-addressee" id="prev-addressee">株式会社グローバル・トラベル</span>
+              <span class="receipt-honorific" id="prev-honorific">様</span>
+            </div>
+
+            <!-- 3. Giant Amount Visual -->
+            <div class="receipt-amount-container">
+              <span class="receipt-amount-label" id="lbl-amount">領収金額</span>
+              <span class="receipt-amount" id="prev-amount">￥110,000-</span>
+            </div>
+
+            <!-- 4. Mid Section (Proviso & Invoice Breakdown) -->
+            <div class="receipt-details-section">
+              <div class="receipt-left-details">
+                <!-- Proviso -->
+                <div class="receipt-proviso-container">
+                  <span class="receipt-proviso-label" id="lbl-proviso">但し書き</span>
+                  <span class="receipt-proviso-val" id="prev-proviso">宿泊費として</span>
+                </div>
+
+                <!-- Notes / Remarks Box -->
+                <div class="receipt-notes-box">
+                  <div class="receipt-notes-label" id="lbl-notes">備考</div>
+                  <div id="prev-notes">
+                    お振込手数料は貴社にてご負担願います。
+                  </div>
+                </div>
+              </div>
+
+              <!-- JPY 2023 Invoice Breakdown table (適格請求書) -->
+              <table class="receipt-breakdown-box" id="prev-breakdown-box">
+                <thead>
+                  <tr>
+                    <th colspan="2" id="lbl-breakdown-title">内訳</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="lbl-breakdown-exclusive">税抜金額</td>
+                    <td id="prev-tax-exclusive">￥100,000-</td>
+                  </tr>
+                  <tr>
+                    <td id="lbl-breakdown-tax">消費税額等</td>
+                    <td id="prev-tax-10-val">￥10,000-</td>
+                  </tr>
+                  <tr>
+                    <td id="lbl-breakdown-10-base">10%対象金額</td>
+                    <td id="prev-tax-10-base">￥100,000-</td>
+                  </tr>
+                  <tr>
+                    <td id="lbl-breakdown-10-val">10%消費税</td>
+                    <td id="prev-tax-10-val-dup">￥10,000-</td>
+                  </tr>
+                  <tr>
+                    <td id="lbl-breakdown-registration">登録番号</td>
+                    <td id="prev-registration">T1234567890123</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 5. Issuer box with stamp -->
+            <div class="receipt-issuer-box">
+              <div class="receipt-issuer-left">
+                <div class="receipt-issuer-name" id="prev-issuer-name">京都民泊・桜</div>
+                <div id="prev-issuer-address">京都府京都市中京区桜小路123-4</div>
+                <div>TEL: <span id="prev-issuer-tel">075-123-4567</span></div>
+                <div>Email: <span id="prev-issuer-email">stay@kyoto-sakura.jp</span></div>
+              </div>
+              
+              <!-- Square Stamp Slot -->
+              <div class="receipt-stamp-area" id="prev-stamp-area">
+                <span class="receipt-stamp-placeholder">角印<br>領収印</span>
+                <canvas id="hanko-canvas" class="hanko-canvas" width="94" height="94"></canvas>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Global scripts loading safely under file:// protocols -->
+  <script src="translations.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

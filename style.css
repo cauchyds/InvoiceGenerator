@@ -1,0 +1,775 @@
+/* ==========================================================================
+   Multi-Lingual WYSIWYG Japanese Receipt Generator - Premium Style System
+   ========================================================================== */
+
+/* Google Fonts Import for Dashboard and Receipt */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Dashboard UI Variables (Dark Glassmorphism Theme) */
+  --bg-gradient: radial-gradient(circle at 10% 20%, rgb(15, 17, 26) 0%, rgb(25, 28, 48) 90%);
+  --sidebar-bg: rgba(16, 20, 38, 0.65);
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --accent-color: #6366f1; /* Indigo */
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --success-color: #10b981; /* Emerald */
+  --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --input-focus: rgba(99, 102, 241, 0.3);
+  --input-focus-border: rgba(99, 102, 241, 0.6);
+  
+  /* Preview Board (Architectural Grid Theme) */
+  --preview-bg: #eceef2;
+  --preview-grid: rgba(0, 0, 0, 0.04);
+  
+  /* Standard Receipt Layout Variables (Formal Light Theme) */
+  --receipt-font-sans: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  --receipt-font-serif: 'Noto Serif JP', 'Yu Mincho', '游明朝', 'MS Mincho', serif;
+  --receipt-bg: #ffffff;
+  --receipt-text: #1a1a1a;
+  --receipt-border-dark: #111111;
+  --receipt-border-light: #cccccc;
+  --receipt-hanko-red: rgba(220, 38, 38, 0.85);
+}
+
+/* ==========================================================================
+   Base & Reset Styles
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
+
+/* ==========================================================================
+   Application Layout (Split Screen)
+   ========================================================================== */
+.app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* --- Left Sidebar (Control Center) --- */
+.control-sidebar {
+  width: 40%;
+  min-width: 420px;
+  max-width: 520px;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-right: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 10;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 30%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-header h1 span {
+  font-size: 1.8rem;
+}
+
+.sidebar-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+.sidebar-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Right Workspace (Live Preview) --- */
+.preview-workspace {
+  flex: 1;
+  background-color: var(--preview-bg);
+  background-image: radial-gradient(var(--preview-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: auto;
+  padding: 40px;
+  height: 100%;
+}
+
+/* ==========================================================================
+   Dashboard UI - Form Components
+   ========================================================================== */
+.form-section {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-section:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #818cf8;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Styled Language Buttons */
+.lang-selector-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.lang-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lang-btn.active {
+  background: var(--accent-color);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Styled Switch (Toggle Checkbox) */
+.switch-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.switch-label-desc {
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-label-desc span:first-child {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.switch-label-desc span:last-child {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .3s;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+  background-color: var(--success-color);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--success-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Dynamic Proviso Tags Quick Select */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.proviso-tag {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--card-border);
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.proviso-tag:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Action Control Area at Bottom */
+.sidebar-footer {
+  padding: 24px;
+  border-top: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--success-gradient);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================================================
+   Interactive Live Preview Sheet
+   ========================================================================== */
+.receipt-wrapper {
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.receipt-sheet {
+  width: 297mm; /* Standard A4 Landscape Width */
+  height: 210mm; /* Standard A4 Landscape Height */
+  background: var(--receipt-bg);
+  color: var(--receipt-text);
+  padding: 24mm 24mm; /* Standard printing margins */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Professional Japanese Receipt Grid & Text Layout */
+.receipt-frame {
+  border: 3px double var(--receipt-border-dark);
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+}
+
+.receipt-title-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-title {
+  font-family: var(--receipt-font-serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 8px;
+  line-height: 1.1;
+  color: var(--receipt-text);
+  border-bottom: 2px solid var(--receipt-border-dark);
+  padding-bottom: 4px;
+}
+
+.receipt-meta {
+  text-align: right;
+  font-family: var(--receipt-font-sans);
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.receipt-meta p {
+  margin-bottom: 4px;
+}
+
+/* Addressee Info (宛名) */
+.receipt-addressee-container {
+  border-bottom: 1px solid var(--receipt-border-dark);
+  padding-bottom: 6px;
+  margin-bottom: 30px;
+  width: 65%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.receipt-addressee {
+  font-family: var(--receipt-font-serif);
+  font-size: 1.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.receipt-honorific {
+  font-family: var(--receipt-font-sans);
+  font-size: 1.1rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Main Amount Visual (金額) */
+.receipt-amount-container {
+  text-align: center;
+  margin-bottom: 35px;
+  background: #fdfdfd;
+  border-top: 1px solid var(--receipt-border-dark);
+  border-bottom: 1px solid var(--receipt-border-dark);
+  padding: 12px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.receipt-amount-container::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2px;
+  border-top: 1px dashed var(--receipt-border-light);
+}
+
+.receipt-amount-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  border-bottom: 1px dashed var(--receipt-border-light);
+}
+
+.receipt-amount-label {
+  font-family: var(--receipt-font-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-right: 15px;
+}
+
+.receipt-amount {
+  font-family: var(--receipt-font-serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border-bottom: 2px double var(--receipt-border-dark);
+  padding: 0 16px;
+  min-width: 320px;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Proviso & Breakdown Section */
+.receipt-details-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  flex: 1;
+  align-items: stretch;
+  gap: 30px;
+}
+
+.receipt-left-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.receipt-proviso-container {
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--receipt-border-light);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+.receipt-proviso-label {
+  font-family: var(--receipt-font-sans);
+  font-size: 0.85rem;
+  font-weight: bold;
+  white-space: nowrap;
+  width: 90px;
+}
+
+.receipt-proviso-val {
+  font-family: var(--receipt-font-serif);
+  font-size: 1.15rem;
+  padding-left: 10px;
+  flex: 1;
+}
+
+/* Dynamic Hanko Stamp Canvas Container */
+.receipt-stamp-area {
+  width: 90px;
+  height: 90px;
+  border: 1px dashed var(--receipt-border-light);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  align-self: flex-end;
+}
+
+.receipt-stamp-placeholder {
+  font-size: 0.65rem;
+  color: #999;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.hanko-canvas {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 94px;
+  height: 94px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Notes area */
+.receipt-notes-box {
+  font-family: var(--receipt-font-sans);
+  font-size: 0.78rem;
+  color: #555;
+  border-top: 1px dashed var(--receipt-border-light);
+  padding-top: 8px;
+}
+
+.receipt-notes-label {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+/* Breakdown Table (適格請求書 / 内訳) */
+.receipt-breakdown-box {
+  width: 250px;
+  border: 1px solid var(--receipt-border-dark);
+  border-collapse: collapse;
+  font-family: var(--receipt-font-sans);
+  font-size: 0.72rem;
+  background: white;
+  align-self: flex-start;
+}
+
+.receipt-breakdown-box th, 
+.receipt-breakdown-box td {
+  border: 1px solid var(--receipt-border-dark);
+  padding: 5px 8px;
+}
+
+.receipt-breakdown-box th {
+  background: #f5f5f5;
+  font-weight: 700;
+  text-align: center;
+}
+
+.receipt-breakdown-box td:last-child {
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Issuer Info Section (領収者) */
+.receipt-issuer-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--receipt-border-dark);
+  padding-top: 12px;
+}
+
+.receipt-issuer-left {
+  font-family: var(--receipt-font-sans);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.receipt-issuer-name {
+  font-family: var(--receipt-font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.receipt-issuer-registration {
+  font-weight: bold;
+  font-size: 0.82rem;
+  margin-top: 6px;
+  color: #111;
+  background: #f8fafc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  display: inline-block;
+}
+
+/* ==========================================================================
+   Utility Classes & Media Queries
+   ========================================================================== */
+.hidden {
+  display: none !important;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+/* High Resolution Vector Print Layout Rules */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  
+  .control-sidebar, 
+  .preview-workspace::before,
+  .sidebar-header,
+  .sidebar-footer,
+  .btn,
+  .form-section {
+    display: none !important;
+  }
+  
+  .preview-workspace {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .receipt-wrapper {
+    transform: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .receipt-sheet {
+    width: 297mm !important;
+    height: 210mm !important;
+    padding: 15mm !important;
+    page-break-inside: avoid;
+    page-break-after: always;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  /* Force Print Background Colors and Borders */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+}
