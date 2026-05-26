@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>民宿・費用領受書/領収書ジェネレーター | Professional Minshuku Receipt Generator</title>
+  <title>民宿・費用請求書/請求書ジェネレーター | Professional Minshuku Invoice Generator</title>
   <!-- SEO Meta Tags -->
-  <meta name="description" content="適格請求書（インボイス制度）に対応した、日本国内の民宿・ホテル向けの多言語（日・中・英）領収書・費用領受書自動作成ツールです。所見即所得（WYSIWYG）で直感的に操作できます。">
-  <meta name="keywords" content="領収書作成, インボイス対応, 民宿領収書, 費用領受书, Invoice Generator Japan, Minshuku Receipt PDF">
+  <meta name="description" content="適格請求書（インボイス制度）に対応した、日本国内の民宿・ホテル向けの多言語（日・中・英）請求書・費用請求書自動作成ツールです。所見即所得（WYSIWYG）で直感的に操作できます。">
+  <meta name="keywords" content="請求書作成, インボイス対応, 民宿請求書, 费用請求书, Invoice Generator Japan, Minshuku Invoice PDF">
   
   <!-- Premium Stylesheets -->
   <link rel="stylesheet" href="style.css?v=2.0.2">
@@ -77,18 +77,24 @@
           </div>
         </section>
 
-        <!-- Section 2: Basic Receipt Details -->
+        <!-- Section 2: Basic Invoice Details -->
         <section class="form-section" aria-labelledby="sec-basic-title">
-          <h2 class="form-section-title" id="sec-basic-title">📝 Receipt Info</h2>
+          <h2 class="form-section-title" id="sec-basic-title">📝 Invoice Info</h2>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="ctrl-receipt-no">Receipt Number (領収書番号)</label>
-              <input type="text" id="ctrl-receipt-no" placeholder="e.g., RC-202605001">
+              <label for="ctrl-receipt-no">Invoice Number (請求書番号)</label>
+              <input type="text" id="ctrl-receipt-no" placeholder="e.g., INV-202605001">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ctrl-date">Issue Date (請求日)</label>
+              <input type="date" id="ctrl-date">
             </div>
             <div class="form-group">
-              <label for="ctrl-date">Issue Date (領収日)</label>
-              <input type="date" id="ctrl-date">
+              <label for="ctrl-due-date">Due Date (お支払期限)</label>
+              <input type="date" id="ctrl-due-date">
             </div>
           </div>
 
@@ -157,16 +163,20 @@
             <!-- 1. Header (Title, No, Date) -->
             <div class="receipt-header">
               <div class="receipt-title-container">
-                <span class="receipt-title" id="receipt-title-text">領収書</span>
+                <span class="receipt-title" id="receipt-title-text">請求書</span>
               </div>
               <div class="receipt-meta">
-                <span class="receipt-meta-label" id="lbl-receipt-no">領収書番号</span>
+                <span class="receipt-meta-label" id="lbl-receipt-no">請求書番号</span>
                 <span class="receipt-meta-colon">:</span>
-                <span class="receipt-meta-value" id="prev-receipt-no">RC-2026052201</span>
+                <span class="receipt-meta-value" id="prev-receipt-no">INV-2026052201</span>
                 
-                <span class="receipt-meta-label" id="lbl-receipt-date">領収日</span>
+                <span class="receipt-meta-label" id="lbl-receipt-date">請求日</span>
                 <span class="receipt-meta-colon">:</span>
                 <span class="receipt-meta-value" id="prev-date">2026年5月22日</span>
+                
+                <span class="receipt-meta-label" id="lbl-due-date">お支払期限</span>
+                <span class="receipt-meta-colon">:</span>
+                <span class="receipt-meta-value" id="prev-due-date">2026年6月22日</span>
               </div>
             </div>
 
@@ -178,7 +188,7 @@
 
             <!-- 3. Giant Amount Visual -->
             <div class="receipt-amount-container">
-              <span class="receipt-amount-label" id="lbl-amount">領収金額</span>
+              <span class="receipt-amount-label" id="lbl-amount">御請求金額</span>
               <span class="receipt-amount" id="prev-amount">￥110,000-</span>
             </div>
 
@@ -261,7 +271,7 @@
               
               <!-- Square Stamp Slot -->
               <div class="receipt-stamp-area" id="prev-stamp-area">
-                <span class="receipt-stamp-placeholder">角印<br>領収印</span>
+                <span class="receipt-stamp-placeholder" id="prev-stamp-placeholder">角印<br>請求印</span>
                 <canvas id="hanko-canvas" class="hanko-canvas" width="94" height="94"></canvas>
               </div>
             </div>

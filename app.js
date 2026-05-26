@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     lang: 'ja',
     layout: 'portrait',
     currency: '￥',
-    receiptNo: 'RC-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '01',
+    receiptNo: 'INV-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '01',
     date: new Date().toISOString().slice(0, 10),
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
     addressee: '株式会社グローバル・トラベル',
     addresseeTitle: '様',
     totalAmount: 110000,
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     taxAmount8Percent: 0,
     registrationNo: 'T1234567890123',
     proviso: '宿泊費として',
-    notes: 'お振込手数料は貴社にてご負担願います。',
+    notes: '【お振込先】\n桜銀行　京都支店\n普通　１２３４５６７\n京都民泊・桜\n\n※お振込手数料は貴社にてご負担願います。',
     issuerName: '京都民泊・桜',
     issuerAddress: '京都府京都市中京区桜小路123-4',
     issuerTel: '075-123-4567',
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currencySelect: document.getElementById('ctrl-currency'),
     receiptNoInput: document.getElementById('ctrl-receipt-no'),
     dateInput: document.getElementById('ctrl-date'),
+    dueDateInput: document.getElementById('ctrl-due-date'),
     addresseeInput: document.getElementById('ctrl-addressee'),
     addresseeTitleSelect: document.getElementById('ctrl-title'),
     totalAmountInput: document.getElementById('ctrl-amount'),
@@ -79,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     prevReceiptNo: document.getElementById('prev-receipt-no'),
     prevDate: document.getElementById('prev-date'),
+    prevDueDate: document.getElementById('prev-due-date'),
     prevAddressee: document.getElementById('prev-addressee'),
     prevHonorific: document.getElementById('prev-honorific'),
     prevAmount: document.getElementById('prev-amount'),
@@ -101,10 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
     hankoCanvas: document.getElementById('hanko-canvas'),
     
     // Label translations targeting in receipt
+    receiptTitleText: document.getElementById('receipt-title-text'),
     lblReceiptNo: document.getElementById('lbl-receipt-no'),
     lblReceiptDate: document.getElementById('lbl-receipt-date'),
+    lblDueDate: document.getElementById('lbl-due-date'),
     lblAmount: document.getElementById('lbl-amount'),
     lblNotes: document.getElementById('lbl-notes'),
+    prevStampPlaceholder: document.getElementById('prev-stamp-placeholder'),
 
     lblBreakdownTitle: document.getElementById('lbl-breakdown-title'),
     lblBreakdownExclusive: document.getElementById('lbl-breakdown-exclusive'),
@@ -127,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.currencySelect.value = state.currency;
     elements.receiptNoInput.value = state.receiptNo;
     elements.dateInput.value = state.date;
+    elements.dueDateInput.value = state.dueDate;
     elements.addresseeInput.value = state.addressee;
     elements.addresseeTitleSelect.value = state.addresseeTitle;
     elements.totalAmountInput.value = state.totalAmount;
@@ -193,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputs = [
       { el: elements.receiptNoInput, key: 'receiptNo' },
       { el: elements.dateInput, key: 'date' },
+      { el: elements.dueDateInput, key: 'dueDate' },
       { el: elements.addresseeInput, key: 'addressee' },
       { el: elements.addresseeTitleSelect, key: 'addresseeTitle' },
       { el: elements.registrationNoInput, key: 'registrationNo' },
@@ -619,10 +627,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const t = TRANSLATIONS[state.lang] || TRANSLATIONS['ja'];
 
     // 1. Update Preview Text Labels (Translation)
+    if (elements.receiptTitleText) {
+      elements.receiptTitleText.textContent = t.title;
+    }
     elements.lblReceiptNo.textContent = t.receiptNo;
     elements.lblReceiptDate.textContent = t.date;
+    elements.lblDueDate.textContent = t.dueDate;
     elements.lblAmount.textContent = t.amount;
     elements.lblNotes.textContent = t.notes;
+
+    if (elements.prevStampPlaceholder) {
+      elements.prevStampPlaceholder.innerHTML = t.stampPlaceholder.replace(' / ', '<br>').replace(' /', '<br>').replace('/ ', '<br>').replace('/', '<br>');
+    }
 
     // Breakdown table labels
     elements.lblBreakdownTitle.textContent = t.breakdown;
@@ -635,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Update Live Data Values
     elements.prevReceiptNo.textContent = state.receiptNo;
     elements.prevDate.textContent = formatDate(state.date);
+    elements.prevDueDate.textContent = formatDate(state.dueDate);
     elements.prevAddressee.textContent = state.addressee;
     
     // Setup honorifics (様 or Esq. or 御中)
