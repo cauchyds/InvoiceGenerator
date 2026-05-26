@@ -483,11 +483,11 @@ input:checked + .slider:before {
 }
 
 .receipt-sheet {
-  width: 297mm; /* Standard A4 Landscape Width */
-  height: 210mm; /* Standard A4 Landscape Height */
+  width: 210mm; /* Standard A4 Portrait Width */
+  height: 297mm; /* Standard A4 Portrait Height */
   background: var(--receipt-bg);
   color: var(--receipt-text);
-  padding: 24mm 24mm; /* Standard printing margins */
+  padding: 12mm 16mm; /* Optimized standard margins to prevent height overflow */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -511,7 +511,7 @@ input:checked + .slider:before {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 25px;
+  margin-bottom: 15px; /* Reduced from 25px */
 }
 
 .receipt-title-container {
@@ -560,7 +560,7 @@ input:checked + .slider:before {
 .receipt-addressee-container {
   border-bottom: 1px solid var(--receipt-border-dark);
   padding-bottom: 6px;
-  margin-bottom: 30px;
+  margin-bottom: 20px; /* Reduced from 30px */
   width: 65%;
   display: flex;
   align-items: flex-end;
@@ -586,11 +586,11 @@ input:checked + .slider:before {
 /* Main Amount Visual (金額) */
 .receipt-amount-container {
   text-align: center;
-  margin-bottom: 35px;
+  margin-bottom: 20px; /* Reduced from 35px */
   background: #fdfdfd;
   border-top: 1px solid var(--receipt-border-dark);
   border-bottom: 1px solid var(--receipt-border-dark);
-  padding: 12px 0;
+  padding: 10px 0; /* Reduced from 12px */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -638,15 +638,14 @@ input:checked + .slider:before {
 /* Proviso & Breakdown Section */
 .receipt-details-section {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 25px;
-  flex: 1;
+  flex-direction: column; /* Stacked vertically by default */
+  margin-bottom: 12px; /* Reduced from 25px */
+  gap: 12px; /* Reduced from 30px */
   align-items: stretch;
-  gap: 30px;
 }
 
 .receipt-left-details {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -689,6 +688,7 @@ input:checked + .slider:before {
   color: #555;
   border-top: 1px dashed var(--receipt-border-light);
   padding-top: 8px;
+  min-height: 60px; /* Modest min-height to prevent vertical empty space overflow */
 }
 
 .receipt-notes-label {
@@ -698,13 +698,14 @@ input:checked + .slider:before {
 
 /* Breakdown Table (適格請求書 / 内訳) */
 .receipt-breakdown-box {
-  width: 250px;
+  width: 100%; /* Spans full width by default in Portrait */
   border: 1px solid var(--receipt-border-dark);
   border-collapse: collapse;
   font-family: var(--receipt-font-sans);
   font-size: 0.72rem;
   background: white;
   align-self: flex-start;
+  margin-left: 0;
 }
 
 .receipt-breakdown-box th, 
@@ -730,7 +731,8 @@ input:checked + .slider:before {
   justify-content: space-between;
   align-items: flex-end;
   border-top: 1px solid var(--receipt-border-dark);
-  padding-top: 12px;
+  padding-top: 10px; /* Reduced from 12px */
+  margin-top: 8px; /* Safe gap */
 }
 
 .receipt-issuer-left {
@@ -808,9 +810,9 @@ input:checked + .slider:before {
   }
 
   .receipt-sheet {
-    width: 297mm !important;
-    height: 210mm !important;
-    padding: 15mm !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    padding: 12mm 12mm !important;
     page-break-inside: avoid;
     page-break-after: always;
     box-shadow: none !important;
@@ -823,18 +825,6 @@ input:checked + .slider:before {
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-  }
-  
-  /* Conditional print sizes based on active layout orientation */
-  body.layout-portrait .receipt-sheet {
-    width: 210mm !important;
-    height: 297mm !important;
-    padding: 12mm 12mm !important;
-  }
-  body.layout-landscape .receipt-sheet {
-    width: 297mm !important;
-    height: 210mm !important;
-    padding: 15mm !important;
   }
 }
 
@@ -1025,42 +1015,7 @@ input:checked + .slider:before {
   font-size: 1rem;
 }
 
-/* ==========================================================================
-   Portrait (Vertical A4) Layout Styles
-   ========================================================================== */
-.receipt-sheet.layout-portrait {
-  width: 210mm;
-  height: 297mm;
-  padding: 16mm 16mm;
-}
 
-/* When portrait mode is active, rearrange details block to stack vertically */
-.receipt-sheet.layout-portrait .receipt-details-section {
-  flex-direction: column;
-  gap: 20px;
-  align-items: stretch;
-  margin-bottom: 20px;
-}
-
-.receipt-sheet.layout-portrait .receipt-left-details {
-  width: 100%;
-}
-
-
-
-.receipt-sheet.layout-portrait .receipt-breakdown-box {
-  width: 100%;
-  margin-left: 0;
-}
-
-.receipt-sheet.layout-portrait .receipt-notes-box {
-  min-height: 100px;
-  flex: none;
-}
-
-.receipt-sheet.layout-portrait .receipt-issuer-box {
-  margin-top: 15px;
-}
 
 /* ==========================================================================
    Sidebar Fee Items Styles

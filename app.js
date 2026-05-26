@@ -123,8 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSettings: document.getElementById('btn-settings'),
     settingsModal: document.getElementById('settings-modal'),
     btnCloseSettings: document.getElementById('btn-close-settings'),
-    btnSaveSettings: document.getElementById('btn-save-settings'),
-    layoutBtns: document.querySelectorAll('.layout-btn')
+    btnSaveSettings: document.getElementById('btn-save-settings')
   };
 
   // --- Initialize App State from UI ---
@@ -159,25 +158,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Set initial active layout button and body/sheet classes
-    elements.layoutBtns.forEach(btn => {
-      if (btn.dataset.layout === state.layout) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-    if (state.layout === 'portrait') {
-      document.body.classList.add('layout-portrait');
-      document.body.classList.remove('layout-landscape');
-      elements.receiptSheet.classList.add('layout-portrait');
-      elements.receiptSheet.classList.remove('layout-landscape');
-    } else {
-      document.body.classList.add('layout-landscape');
-      document.body.classList.remove('layout-portrait');
-      elements.receiptSheet.classList.add('layout-landscape');
-      elements.receiptSheet.classList.remove('layout-portrait');
-    }
+    // We permanently default to vertical (portrait) layout
+    state.layout = 'portrait';
+    document.body.classList.add('layout-portrait');
+    document.body.classList.remove('layout-landscape');
+    elements.receiptSheet.classList.add('layout-portrait');
+    elements.receiptSheet.classList.remove('layout-landscape');
 
 
 
@@ -314,30 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Layout Selector Buttons
-    elements.layoutBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        elements.layoutBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.layout = btn.dataset.layout;
-
-        if (state.layout === 'portrait') {
-          document.body.classList.add('layout-portrait');
-          document.body.classList.remove('layout-landscape');
-          elements.receiptSheet.classList.add('layout-portrait');
-          elements.receiptSheet.classList.remove('layout-landscape');
-        } else {
-          document.body.classList.add('layout-landscape');
-          document.body.classList.remove('layout-portrait');
-          elements.receiptSheet.classList.add('layout-landscape');
-          elements.receiptSheet.classList.remove('layout-portrait');
-        }
-
-        renderPreview();
-        updateResponsiveScale();
-      });
-    });
-
     // Export PDF / Print with Dynamic Orientation style injection
     elements.btnPrint.addEventListener('click', () => {
       const existingStyle = document.getElementById('dynamic-print-style');
@@ -345,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const style = document.createElement('style');
       style.id = 'dynamic-print-style';
-      style.innerHTML = `@page { size: A4 ${state.layout}; margin: 0; }`;
+      style.innerHTML = `@page { size: A4 portrait; margin: 0; }`;
       document.head.appendChild(style);
 
       window.print();
