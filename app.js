@@ -90,7 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
     prevTax10Base: document.getElementById('prev-tax-10-base'),
     prevTax10Val: document.getElementById('prev-tax-10-val'),
     prevTax10ValDup: document.getElementById('prev-tax-10-val-dup'),
-    prevRegistration: document.getElementById('prev-registration'),
+    prevRegistration: document.getElementById('prev-issuer-registration'),
+    prevIssuerRegistrationContainer: document.getElementById('prev-issuer-registration-container'),
     
     prevIssuerName: document.getElementById('prev-issuer-name'),
     prevIssuerAddress: document.getElementById('prev-issuer-address'),
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lblBreakdownTax: document.getElementById('lbl-breakdown-tax'),
     lblBreakdown10Base: document.getElementById('lbl-breakdown-10-base'),
     lblBreakdown10Val: document.getElementById('lbl-breakdown-10-val'),
-    lblBreakdownRegistration: document.getElementById('lbl-breakdown-registration'),
+    lblIssuerRegistration: document.getElementById('lbl-issuer-registration'),
 
     // Settings modal elements
     btnSettings: document.getElementById('btn-settings'),
@@ -629,7 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.lblBreakdownTax.textContent = t.consumptionTax;
     elements.lblBreakdown10Base.textContent = t.taxRate10;
     elements.lblBreakdown10Val.textContent = t.taxAmount10;
-    elements.lblBreakdownRegistration.textContent = t.registrationNo;
+    elements.lblIssuerRegistration.textContent = t.registrationNo;
 
     // 2. Update Live Data Values
     elements.prevReceiptNo.textContent = state.receiptNo;
@@ -716,9 +717,12 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.prevTax10Base.textContent = formatCurrency(state.taxRate10Percent, state.currency);
       elements.prevTax10Val.textContent = formatCurrency(state.taxAmount10Percent, state.currency);
       elements.prevTax10ValDup.textContent = formatCurrency(state.taxAmount10Percent, state.currency);
+      
+      elements.prevIssuerRegistrationContainer.classList.remove('hidden');
       elements.prevRegistration.textContent = state.registrationNo ? state.registrationNo : '-';
     } else {
       elements.prevBreakdownBox.classList.add('hidden');
+      elements.prevIssuerRegistrationContainer.classList.add('hidden');
     }
 
     // Issuer details
